@@ -9,14 +9,19 @@ Executes comprehensive research with:
 """
 
 import os
+import sys
 import numpy as np
 import pandas as pd
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
 from src.data_validator import DataValidator
 from src.event_detector import EventDetector
 from src.statistical_engine import StatisticalEngine
 from src.backtester import EventBacktester
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_FILE = os.path.join(BASE_DIR, "data", "nifty50_daily.csv")
 
 def main():
