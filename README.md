@@ -20,7 +20,7 @@ This repository provides an institutional-grade quantitative event study and bac
 
 ---
 
-## 2. Repository Structure
+## 2. Minimalist Repository Structure
 
 ```
 algochowk-quant-research/
@@ -37,11 +37,7 @@ algochowk-quant-research/
 │   └── generate_figures.py         # Publication chart generator (4 high-res figures)
 ├── tests/
 │   ├── __init__.py
-│   ├── test_data_validator.py      # Unit tests for data validation
-│   ├── test_event_detector.py      # Unit tests for event detection & zero look-ahead bias
-│   ├── test_statistical_engine.py  # Unit tests for statistical hypothesis tests
-│   ├── test_backtester.py          # Unit tests for backtest mechanics & friction deductions
-│   └── test_advanced_features.py   # Unit tests for volume surges, stops, and recovery matrix
+│   └── test_all.py                 # Unified, single test suite covering all modules
 ├── notebooks/
 │   └── nifty_event_study.ipynb     # Interactive research notebook with narrative and plots
 ├── docs/
@@ -59,9 +55,9 @@ algochowk-quant-research/
 
 ## 3. Quick Start & Reproduction
 
-### Run Test Suite (12/12 Tests Passing)
+### Run Unified Test Suite
 ```powershell
-python -m unittest discover -s tests -v
+python -m unittest tests.test_all
 ```
 
 ### Run Full Research Analysis
