@@ -43,7 +43,6 @@ algochowk-quant-research/
 ├── docs/
 │   ├── research_note.md            # Max 2-page publication-grade Research Note
 │   ├── ai_usage_note.md            # Required 1-page AI Usage Note
-│   ├── video_presentation.md       # 2-3 minute presentation script with slide guide
 │   ├── fig1_forward_returns_comparison.png
 │   ├── fig2_regime_decomposition.png
 │   ├── fig3_event_study_trajectory.png
@@ -95,7 +94,6 @@ python -m src.generate_figures
 
 ---
 
-## 5. Submission Documents
+## 5. Official Research Notes
 * **[Research Note (2 Pages)](docs/research_note.md)**
 * **[AI Usage Note (1 Page)](docs/ai_usage_note.md)**
-* **[Video Presentation Script (2-3 Minutes)](docs/video_presentation.md)**
