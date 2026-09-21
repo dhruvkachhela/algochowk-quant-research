@@ -108,6 +108,19 @@ class TestQuantitativePipeline(unittest.TestCase):
         self.assertEqual(len(doc), 2, f"PDF must be strictly 2 pages, found {len(doc)}")
         doc.close()
 
+    # --- AI Usage Note Deliverable ---
+    def test_ai_usage_deliverables(self):
+        import os
+        import pymupdf
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        md_path = os.path.join(base_dir, "docs", "ai_usage_note.md")
+        pdf_path = os.path.join(base_dir, "docs", "ai_usage_note.pdf")
+        self.assertTrue(os.path.exists(md_path), "docs/ai_usage_note.md must exist")
+        self.assertTrue(os.path.exists(pdf_path), "docs/ai_usage_note.pdf must exist")
+        doc = pymupdf.open(pdf_path)
+        self.assertEqual(len(doc), 1, f"AI usage PDF must be strictly 1 page, found {len(doc)}")
+        doc.close()
+
 if __name__ == "__main__":
     unittest.main()
 
