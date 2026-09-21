@@ -9,7 +9,7 @@ Simulates realistic portfolio execution with:
 
 import numpy as np
 import pandas as pd
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 
 class EventBacktester:
     def __init__(

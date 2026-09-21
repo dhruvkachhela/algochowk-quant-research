@@ -10,7 +10,7 @@ Includes institutional microstructure filters:
 
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List
 
 class EventDetector:
     def __init__(self, df: pd.DataFrame):

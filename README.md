@@ -286,12 +286,31 @@ Each figure below captures a critical econometric dimension of the NIFTY 50 even
 
 ---
 
-## 10. Official Submission Deliverables
-* **[2-Page Academic Whitepaper PDF](docs/research_note.pdf)** — Formatted in Elsevier/IEEE symposium two-column layout with dense mathematical and econometric formulations (Strictly 2 Pages).
-* **[Research Note Markdown](docs/research_note.md)** — Full 14-section quantitative research document matching the academic PDF.
-* **[AI Usage Disclosure PDF](docs/ai_usage_note.pdf)** — Formal 1-page AI usage disclosure and methodology document (Strictly 1 Page).
-* **[AI Usage Disclosure Markdown](docs/ai_usage_note.md)** — Comprehensive AI literature synthesis and human oversight matrix.
-* **[Interactive Research Notebook](notebooks/nifty_event_study.ipynb)** — Deterministic step-by-step Jupyter replication notebook.
+---
+
+## 10. Video Presentation & Walkthrough (2m 18s)
+
+A complete 2–3 minute video presentation walking through the quantitative approach, empirical findings, and key takeaways is available in the repository:
+
+* **[Video Presentation Walkthrough (`docs/walkthrough_video.mp4`)](docs/walkthrough_video.mp4)**
+  - **Duration**: 2 minutes 18 seconds (138 seconds)
+  - **Resolution & Encoding**: 974x954 H.264 / AAC with progressive web streaming (`+faststart`)
+  - **File Size**: 6.54 MB
+  - **Content**: Covers the core hypothesis, statistical falsification of post-shock bounce, overnight gap extraction, the 200 SMA bear trap, and backtesting net of Indian statutory costs.
+
+---
+
+## 11. Official Submission Deliverables
+
+| # | Submission Deliverable | Specification & Format | File Link |
+|:---:|---|---|---|
+| **1** | **GitHub Repository** | Full reproducible quantitative codebase | [`github.com/dhruvkachhela/algochowk-quant-research`](https://github.com/dhruvkachhela/algochowk-quant-research) |
+| **2** | **Research Note** | **Strictly 2 pages** (Elsevier/IEEE format) | [`docs/research_note.pdf`](docs/research_note.pdf) \| [`docs/research_note.md`](docs/research_note.md) |
+| **3** | **README** | Methodology, assumptions, setup, results, limitations | [`README.md`](README.md) |
+| **4** | **AI Usage Note** | **Strictly 1 page** (methodology & literature disclosure) | [`docs/ai_usage_note.pdf`](docs/ai_usage_note.pdf) \| [`docs/ai_usage_note.md`](docs/ai_usage_note.md) |
+| **5** | **2–3 Minute Video** | 2m 18s screen recording showing approach & findings | [`docs/walkthrough_video.mp4`](docs/walkthrough_video.mp4) |
+| **—** | **Interactive Notebook** | Jupyter notebook with live code & charts | [`notebooks/nifty_event_study.ipynb`](notebooks/nifty_event_study.ipynb) |
+
 
 
 

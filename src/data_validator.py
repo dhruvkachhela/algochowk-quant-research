@@ -9,12 +9,10 @@ Validates integrity of daily OHLCV market data:
 """
 
 import pandas as pd
-import numpy as np
 from typing import Dict, Any, Tuple, List
 
 class DataValidator:
     def __init__(self, df: pd.DataFrame):
-        self.raw_df = df.copy()
         self.df = df.copy()
         self.audit_log: List[str] = []
         self.is_valid: bool = False
