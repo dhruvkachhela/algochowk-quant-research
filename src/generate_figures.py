@@ -1,5 +1,10 @@
 """
-Chart and Visualizations Generator for Research Note and Jupyter Notebook
+Figures Generator
+Produces 4 publication-grade figures:
+1. Fig 1: Forward Returns vs Baseline across Horizons
+2. Fig 2: Regime Decomposition (Bull Price > 200 SMA vs Bear Price < 200 SMA)
+3. Fig 3: Academic Cumulative Abnormal Return (CAR) Event Study Window [T-5 to T+10]
+4. Fig 4: Empirical Recovery Probability Curve (Kaplan-Meier Style)
 """
 
 import os
@@ -19,22 +24,18 @@ DOCS_DIR = os.path.join(BASE_DIR, "docs")
 
 def generate_visualizations():
     sns.set_theme(style="whitegrid")
-    plt.rcParams.update({'font.sans-serif': 'Arial', 'font.size': 11})
+    plt.rcParams.update({'font.sans-serif': 'Arial', 'font.size': 10})
     
     raw_df = pd.read_csv(DATA_FILE)
-    validator = DataValidator(raw_df)
-    clean_df, _ = validator.validate()
+    clean_df, _ = DataValidator(raw_df).validate()
     
     detector = EventDetector(clean_df)
-    stat_engine = StatisticalEngine(seed=42)
-    backtester = EventBacktester(clean_df)
-    
     holding_periods = [1, 2, 3, 5, 10]
     baselines = detector.get_unconditional_baseline(holding_periods)
     events = detector.detect_events(threshold_pct=-2.0, holding_periods=holding_periods)
     
-    # 1. Figure 1: Forward Return Comparison (Event vs Baseline across Horizons)
-    fig, ax = plt.subplots(figsize=(10, 5))
+    # 1. Figure 1: Forward Return Comparison
+    fig, ax = plt.subplots(figsize=(9, 4.5))
     horizons = ["1d", "2d", "3d", "5d", "10d"]
     base_means = [baselines[h].mean() for h in holding_periods]
     close_means = [events[f"Fwd_Ret_Close_{h}d"].mean() for h in holding_periods]
@@ -42,12 +43,10 @@ def generate_visualizations():
     
     x = np.arange(len(horizons))
     width = 0.25
-    
     ax.bar(x - width, base_means, width, label="Unconditional Baseline", color="#7f8c8d")
     ax.bar(x, close_means, width, label="Post-Drop (T Close Entry)", color="#2980b9")
     ax.bar(x + width, open_means, width, label="Post-Drop (T+1 Open Entry)", color="#e74c3c")
-    
-    ax.set_xlabel("Forward Holding Horizon")
+    ax.set_xlabel("Holding Horizon")
     ax.set_ylabel("Mean Return (%)")
     ax.set_title("NIFTY 50 Forward Returns: Event vs Baseline (2007–2026)")
     ax.set_xticks(x)
@@ -57,48 +56,64 @@ def generate_visualizations():
     plt.savefig(os.path.join(DOCS_DIR, "fig1_forward_returns_comparison.png"), dpi=300)
     plt.close()
     
-    # 2. Figure 2: Bull vs Bear Regime Decomposition (200 SMA)
+    # 2. Figure 2: Bull vs Bear Regime Decomposition
     bull_events = events[events["Regime_Bull"] == True]
     bear_events = events[events["Regime_Bull"] == False]
-    
-    fig, ax = plt.subplots(figsize=(9, 5))
+    fig, ax = plt.subplots(figsize=(9, 4.5))
     bull_means = [bull_events[f"Fwd_Ret_Close_{h}d"].mean() for h in holding_periods]
     bear_means = [bear_events[f"Fwd_Ret_Close_{h}d"].mean() for h in holding_periods]
-    
-    ax.plot(horizons, bull_means, marker="o", linewidth=2.5, color="#27ae60", label="Bull Regime (Price > 200 SMA, N=54)")
-    ax.plot(horizons, bear_means, marker="s", linewidth=2.5, color="#c0392b", label="Bear Regime (Price < 200 SMA, N=146)")
+    ax.plot(horizons, bull_means, marker="o", linewidth=2.0, color="#27ae60", label="Bull Regime (Price > 200 SMA, N=54)")
+    ax.plot(horizons, bear_means, marker="s", linewidth=2.0, color="#c0392b", label="Bear Regime (Price < 200 SMA, N=146)")
     ax.plot(horizons, base_means, linestyle="--", color="#7f8c8d", label="Unconditional Baseline")
-    
     ax.set_xlabel("Holding Horizon")
     ax.set_ylabel("Mean Return (%)")
-    ax.set_title("Regime Falsification: Bull Dip-Buying vs Bear Falling Knife")
+    ax.set_title("Regime Falsification: Bull Dip-Buying vs Bear Downside Momentum")
     ax.legend()
     plt.tight_layout()
     plt.savefig(os.path.join(DOCS_DIR, "fig2_regime_decomposition.png"), dpi=300)
     plt.close()
     
-    # 3. Figure 3: Equity Curve of Mean-Reversion Strategy vs Buy & Hold
-    bt_res = backtester.run_backtest(events, holding_period_days=5, execution_model="close")
-    eq_series = bt_res["equity_series"]
+    # 3. Figure 3: Academic Event Study Trajectory Window [T-5 to T+10]
+    traj_df = detector.get_event_study_trajectory(events["Event_Idx"].tolist(), pre_days=5, post_days=10)
+    mean_traj = traj_df.mean()
+    median_traj = traj_df.median()
+    p25_traj = traj_df.quantile(0.25)
+    p75_traj = traj_df.quantile(0.75)
     
-    # NIFTY Buy & Hold baseline normalized to initial capital
-    nifty_bh = (clean_df["Close"] / clean_df["Close"].iloc[0]) * 1_000_000.0
-    nifty_bh.index = pd.to_datetime(clean_df["Date"])
-    
-    fig, ax = plt.subplots(figsize=(11, 5))
-    ax.plot(nifty_bh.index, nifty_bh / 1_000_000.0, label="NIFTY 50 Buy & Hold (Benchmark)", color="#34495e", alpha=0.7)
-    ax.plot(eq_series.index, eq_series / 1_000_000.0, label="5-Day Mean Reversion Strategy (Net of Friction)", color="#e67e22", linewidth=2.0)
-    
-    ax.set_yscale("log")
-    ax.set_xlabel("Year")
-    ax.set_ylabel("Portfolio Value (Log Scale, Base = 1.0)")
-    ax.set_title("Portfolio Equity Trajectory: Mean-Reversion vs Buy & Hold (2007–2026)")
+    fig, ax = plt.subplots(figsize=(10, 4.8))
+    days_axis = list(traj_df.columns)
+    ax.plot(days_axis, mean_traj, color="#2c3e50", linewidth=2.2, label="Mean Path")
+    ax.plot(days_axis, median_traj, color="#2980b9", linestyle="--", linewidth=1.8, label="Median Path")
+    ax.fill_between(days_axis, p25_traj, p75_traj, color="#3498db", alpha=0.18, label="Interquartile Range (25th-75th %ile)")
+    ax.axvline(x="T0", color="#e74c3c", linestyle=":", linewidth=2.0, label="Event Crash Day (T0)")
+    ax.axhline(y=100.0, color="#bdc3c7", linestyle="--", linewidth=1.0)
+    ax.set_xlabel("Event Window Relative Days")
+    ax.set_ylabel("Normalized Price Index (T0 Close = 100.0)")
+    ax.set_title("Academic Event Study: NIFTY 50 Trajectory Around -2% Crash Days")
     ax.legend()
     plt.tight_layout()
-    plt.savefig(os.path.join(DOCS_DIR, "fig3_backtest_equity_curve.png"), dpi=300)
+    plt.savefig(os.path.join(DOCS_DIR, "fig3_event_study_trajectory.png"), dpi=300)
     plt.close()
     
-    print("[OK] Generated all 3 publication-grade figures in docs/ directory.")
+    # 4. Figure 4: Empirical Recovery Probability Curve
+    rec_dict = detector.compute_recovery_matrix(events, max_days=20)
+    days_k = [1, 2, 3, 5, 10, 20]
+    prob_50 = [rec_dict[f"Prob_Rec_50_pct_{d}d"] for d in days_k]
+    prob_100 = [rec_dict[f"Prob_Rec_100_pct_{d}d"] for d in days_k]
+    
+    fig, ax = plt.subplots(figsize=(9, 4.5))
+    ax.plot(days_k, prob_50, marker="o", linewidth=2.0, color="#3498db", label="Prob of Recovering >= 50% of Drop")
+    ax.plot(days_k, prob_100, marker="s", linewidth=2.0, color="#9b59b6", label="Prob of Recovering 100% of Drop")
+    ax.set_xlabel("Days Elapsed After Crash (K)")
+    ax.set_ylabel("Empirical Probability (%)")
+    ax.set_title("Survival Analysis: Cumulative Probability of NIFTY Recovery by Day K")
+    ax.set_xticks(days_k)
+    ax.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(DOCS_DIR, "fig4_recovery_probability_curve.png"), dpi=300)
+    plt.close()
+    
+    print("[OK] All 4 publication-grade figures generated successfully in docs/.")
 
 if __name__ == "__main__":
     generate_visualizations()
